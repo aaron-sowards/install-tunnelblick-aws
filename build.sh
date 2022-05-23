@@ -60,7 +60,7 @@ echo "echo 'Opening log for $APP_PATH'" >> "$APP_PATH"/Contents/MacOS/"$APP_NAME
 chmod +x "$APP_PATH"/Contents/MacOS/"$APP_NAME"
 
 # Copy resources (.pkg, .json, etc.)
-cp -R $BUILD_PATH/resources/openvpn $RESOURCE_DIR/openvpn
+cp -R $BUILD_PATH/resources/openvpn $RESOURCE_DIR/
 
 cat <<EOF >"$APP_PATH"/Contents/Scripts/preinstall
 #!/bin/bash
@@ -89,8 +89,7 @@ EOF
 cat $BUILD_PATH/lib/MDM-Shell-Functions/functions.sh >>"$APP_PATH"/Contents/Scripts/postinstall
 cat $BUILD_PATH/postinstall.sh >>"$APP_PATH"/Contents/Scripts/postinstall
 cat <<EOF >>"$APP_PATH"/Contents/Scripts/postinstall
-echo "[Debug] Sleeping for 60 seconds before removal..."
-sleep 60
+rm -rf \$TMP_FOLDER
 echo "removing $APP"
 rm -rf $APP_PATH
 pkgutil --forget dental.beam.$APP_NAME
@@ -98,7 +97,7 @@ exit 0
 EOF
 chmod +x "$APP_PATH"/Contents/Scripts/postinstall 
 
-echo "Buidling package"
+echo "Building package"
 pkgbuild --scripts "$APP_PATH"/Contents/Scripts --install-location /Applications  --component "$APP_PATH" ./${BUILD}.pkg
 productbuild --synthesize --package ${BUILD}.pkg /Applications --version $VERSION ./dist.xml
 productbuild --distribution dist.xml --version $VERSION --package-path ./${BUILD}.pkg ./${BUILD}-final.pkg
